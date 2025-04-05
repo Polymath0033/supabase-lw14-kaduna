@@ -28,7 +28,7 @@ export default {
           100: "#191B25",
         },
         red: {
-          500: "c",
+          500: "#FB3748",
           100: "#FFD5D8",
         },
       },
@@ -118,6 +118,7 @@ export default {
         sans: ["Inter", "sans-serif"],
         serif: ["Noto serif", "serif"],
         monospace: ["Source code pro", "monospace"],
+        cursive: ["Pacifico", "cursive"],
       },
     },
   },
