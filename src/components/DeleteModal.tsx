@@ -1,6 +1,9 @@
 import { FC } from "react";
 
-export const DeleteModal: FC<{ title?: string }> = ({ title }) => {
+export const DeleteModal: FC<{
+  onClose: () => void;
+  deleteHandler: () => void;
+}> = ({ onClose, deleteHandler }) => {
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50">
       <div className="bg-neutral-700 border border-solid border-neutral-600 min-w-[440px] max-w-md  gap-200 flex flex-start flex-col rounded-12 shadow-md">
@@ -47,10 +50,18 @@ export const DeleteModal: FC<{ title?: string }> = ({ title }) => {
 
         <div className="w-full rounded-12 bg-neutral-600 h-[1px] "></div>
         <div className="flex gap-200 justify-end p-250">
-          <button className="bg-gray-500  text-white py-150 px-200 flex justify-center items-center rounded-8 text-text-preset-4">
+          <button
+            className="bg-gray-500  text-white py-150 px-200 flex justify-center items-center rounded-8 text-text-preset-4"
+            type="button"
+            onClick={onClose}
+          >
             Cancel
           </button>
-          <button className="bg-red-500 text-white py-150 px-200 flex justify-center items-center rounded-8 text-text-preset-4">
+          <button
+            type="button"
+            onClick={deleteHandler}
+            className="bg-red-500 text-white py-150 px-200 flex justify-center items-center rounded-8 text-text-preset-4"
+          >
             Delete
           </button>
         </div>
