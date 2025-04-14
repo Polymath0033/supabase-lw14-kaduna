@@ -48,7 +48,7 @@ export const Home: FC = () => {
         <span className="text-white text-2xl font-bold">My Notes</span>
         <span className="text-neutral-300 text-sm ml-2">({notes.length})</span>
       </p> */}
-      <main className="w-full px-[42px] mt-12  grid gap-3 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
+      <main className="w-full px-[42px] mt-12 grid gap-3 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
         {loading && <div className="text-white text-center">Loading...</div>}
         {error && <div className="text-red-500 text-center">{error}</div>}
         {notes.length === 0 && !loading && (
@@ -59,7 +59,11 @@ export const Home: FC = () => {
           !error &&
           notes.length > 0 &&
           notes.map((note) => (
-            <Link to={`/note/${note.id}`} key={note.id}>
+            <Link
+              to={`/note/${note.id}`}
+              className="w-full border-4 border-red-500"
+              key={note.id}
+            >
               <NoteCard
                 title={note.title}
                 content={note.content}
