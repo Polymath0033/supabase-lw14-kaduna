@@ -186,7 +186,7 @@ The `notes` table has the following structure:
 
 This project uses **Row-Level Security (RLS)** in Supabase to ensure that users can only access their own notes. The RLS policies are defined in the Supabase dashboard and are critical for securing the database.
 
-You can find example RLS queries in the `assets/rls-queries` folder. These images illustrate how the RLS policies are configured in Supabase.
+You can find example RLS queries in the `assets/rls-queries` folder. These images illustrate how the RLS policies are configured in Supabase. Go to supabase dashboard, navigate to the `Database` section, and then to `Policies` to view and manage these policies.
 
 #### Example RLS Policy
 
