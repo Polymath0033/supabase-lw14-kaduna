@@ -5,6 +5,7 @@ import { supabase } from "../libs/supabase";
 import { useEffect, useState } from "react";
 import { Notes } from "../types/supabase";
 import { DeleteModal } from "../components/DeleteModal";
+import { useUser } from "../hooks/useUser";
 
 export const Note: FC = () => {
   const navigate = useNavigate();
@@ -13,15 +14,25 @@ export const Note: FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { user, error: userError, loading: userLoading } = useUser();
+  useEffect(() => {
+    if (userLoading) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [userLoading]);
 
   useEffect(() => {
     const fetchNote = async () => {
       if (!id) return;
+      if (!user) return;
       setLoading(true);
       const { data, error } = await supabase
         .from("notes")
         .select("*")
         .eq("id", id)
+        .eq("user_id", user?.id)
         .single();
       console.log("data", data);
       setLoading(false);
@@ -34,12 +45,22 @@ export const Note: FC = () => {
       }
     };
     fetchNote();
-  }, [id]);
+  }, [id, user]);
+  useEffect(() => {
+    if (userError) {
+      setError(userError);
+    }
+  }, [userError]);
 
   const deleteHandler = async () => {
     if (!id) return;
+    if (!user) return;
     setLoading(true);
-    const { error } = await supabase.from("notes").delete().eq("id", id);
+    const { error } = await supabase
+      .from("notes")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user?.id);
     setLoading(false);
     if (error) {
       setError(error.message);
@@ -77,11 +98,11 @@ export const Note: FC = () => {
             </svg>
             Go Back
           </button>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={() => navigate(`/note/${note?.id}/edit`)}
-              className="text-text-preset-5 text-neutral-300 flex items-center gap-1"
+              className="text-text-preset-3 text-white flex items-center gap-1 bg-blue-500 hover:bg-blue-600 transition duration-300 ease-in-out focus:bg-blue-600 rounded-md px-3 py-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -100,18 +121,35 @@ export const Note: FC = () => {
             <button
               type="button"
               onClick={() => setShowDeleteModal(true)}
-              className="text-text-preset-5 text-neutral-300 flex gap-1 items-center"
+              className="text-text-preset-3 text-white flex gap-1 items-center bg-red-500 hover:bg-red-600 transition duration-300 ease-in-out focus:bg-red-600 rounded-md px-3 py-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
+                width="24"
+                height="26"
+                viewBox="0 0 24 26"
                 fill="none"
               >
                 <path
-                  d="M2.25 15.75V17.25H3.75L14.25 6.75L12 4.5L2.25 14.25V15.75ZM12.75 2.25L15.75 5.25L13.5 7.5L10.5 4.5L12.75 2.25Z"
-                  fill="#CACFD8"
+                  d="M14.8521 4.37899L15.6702 6.16378H18.3097C19.1212 6.16378 19.7791 6.82166 19.7791 7.6332V8.7214C19.7791 9.27626 19.3293 9.72606 18.7745 9.72606H5.00466C4.4498 9.72606 4 9.27626 4 8.7214V7.6332C4 6.82166 4.65788 6.16378 5.46943 6.16378H8.10885L8.92705 4.37899C9.17255 3.84339 9.70775 3.5 10.2969 3.5H13.4821C14.0713 3.5 14.6065 3.84339 14.8521 4.37899Z"
+                  stroke="#CACFD8"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M18.24 9.80078V18.4865C18.24 20.1511 16.9073 21.5005 15.2634 21.5005H8.51661C6.8727 21.5005 5.54004 20.1511 5.54004 18.4865V9.80078"
+                  stroke="#CACFD8"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M10.1992 13.3164V17.8248M13.5796 13.3164V17.8248"
+                  stroke="#CACFD8"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
               Delete

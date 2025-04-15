@@ -7,7 +7,7 @@ export const NoteCard: FC<{
   className?: string;
 }> = ({ title, content, updateAt }) => {
   return (
-    <article className="rounded-8 w-[280px] p-4 bg-neutral-950 flex flex-col items-start justify-start gap-2">
+    <article className="rounded-8 w-full p-4 bg-neutral-950 flex flex-col items-start justify-start gap-2">
       <h4 className="capitalize text-white text-text-preset-3 ">{title}</h4>
       <p className="text-text-preset-6 text-neutral-100 ">
         {content.length > 50 ? content.substring(0, 50) + "..." : content}{" "}

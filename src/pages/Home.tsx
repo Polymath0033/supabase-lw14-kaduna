@@ -6,32 +6,45 @@ import { useState, useEffect } from "react";
 import { supabase } from "../libs/supabase";
 import { Notes } from "../types/supabase";
 import moment from "moment";
+import { useUser } from "../hooks/useUser";
 
 export const Home: FC = () => {
   const [notes, setNotes] = useState<Notes[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const fetchNotes = async () => {
-    setLoading(true);
-    try {
+  const { user, loading: userLoading, error: userError } = useUser();
+  useEffect(() => {
+    if (userLoading) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [userLoading]);
+  useEffect(() => {
+    const fetchNotes = async () => {
+      if (!user) return;
+      setLoading(true);
       const { data, error } = await supabase
         .from("notes")
         .select("*")
+        .eq("user_id", user.id)
         .order("last_updated", { ascending: false });
-      if (error) throw error;
-      setNotes(data);
-      console.log("notes", data);
-
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      setError("Failed to fetch notes");
-      console.error(error);
-    }
-  };
-  useEffect(() => {
+      if (error) {
+        setError(error.message);
+        return;
+      }
+      if (data) {
+        setNotes(data);
+      }
+    };
     fetchNotes();
-  }, []);
+  }, [user]);
+  useEffect(() => {
+    if (userError) {
+      setError(userError);
+    }
+  }, [userError]);
 
   return (
     <div className="bg-neutral-700 h-screen flex flex-col w-full ">
@@ -44,11 +57,8 @@ export const Home: FC = () => {
           + Add new notes
         </Link>
       </AppHeader>
-      {/* <p className="flex items-center text-neutral-300 mt-4 px-[42px]">
-        <span className="text-white text-2xl font-bold">My Notes</span>
-        <span className="text-neutral-300 text-sm ml-2">({notes.length})</span>
-      </p> */}
-      <main className="w-full px-[42px] mt-12 grid gap-3 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+     
+      <main className="w-full px-[42px] mt-12 grid gap-3 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
         {loading && <div className="text-white text-center">Loading...</div>}
         {error && <div className="text-red-500 text-center">{error}</div>}
         {notes.length === 0 && !loading && (
@@ -59,11 +69,7 @@ export const Home: FC = () => {
           !error &&
           notes.length > 0 &&
           notes.map((note) => (
-            <Link
-              to={`/note/${note.id}`}
-              className="w-full border-4 border-red-500"
-              key={note.id}
-            >
+            <Link to={`/note/${note.id}`} className="" key={note.id}>
               <NoteCard
                 title={note.title}
                 content={note.content}

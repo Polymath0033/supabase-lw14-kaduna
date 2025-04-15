@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../libs/supabase";
 import { Notes } from "../types/supabase";
 import AppInput from "../components/AppInput";
+import { useUser } from "../hooks/useUser";
 export const EditNote: FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -12,6 +13,14 @@ export const EditNote: FC = () => {
   const [error, setError] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const { user, error: userError, loading: userLoading } = useUser();
+  useEffect(() => {
+    if (userLoading) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [userLoading]);
   useEffect(() => {
     const fetchNote = async () => {
       if (!id) return;
@@ -20,8 +29,8 @@ export const EditNote: FC = () => {
         .from("notes")
         .select("*")
         .eq("id", id)
+        .eq("user_id", user?.id)
         .single();
-      console.log("data", data);
       setLoading(false);
       if (data) {
         setNote(data);
@@ -34,7 +43,12 @@ export const EditNote: FC = () => {
       }
     };
     fetchNote();
-  }, [id]);
+  }, [id, user]);
+  useEffect(() => {
+    if (userError) {
+      setError(userError);
+    }
+  }, [userError]);
   const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -42,11 +56,18 @@ export const EditNote: FC = () => {
       alert("Please fill in all fields");
       return;
     }
+    if (!id) return;
+    if (!user) return;
     const { data, error } = await supabase
       .from("notes")
-      .update({ title: title, content: content })
+      .update({
+        title: title,
+        content: content,
+      })
       .eq("id", id)
-      .select("*");
+      .eq("user_id", user.id)
+      .select("*")
+      .single();
     setLoading(false);
     console.log("data", data);
 

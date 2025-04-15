@@ -1,14 +1,29 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { AppHeader } from "../components/AppHeader";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../libs/supabase";
-// import { useUser } from "../hooks/useUser";
+import { useUser } from "../hooks/useUser";
+
 export const NewNote: FC = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { user, loading: userLoading, error: userError } = useUser();
+
+  useEffect(() => {
+    if (userLoading) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [userLoading]);
+  useEffect(() => {
+    if (userError) {
+      setError(userError);
+    }
+  }, [userError]);
 
   const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +32,7 @@ export const NewNote: FC = () => {
       alert("Please fill in all fields");
       return;
     }
-    const user = await supabase.auth.getUser();
+
     if (!user) {
       alert("Please log in to continue");
       return;
@@ -28,7 +43,7 @@ export const NewNote: FC = () => {
         {
           title: title,
           content: content,
-          user_id: user?.data?.user?.id,
+          user_id: user.id,
         },
       ])
       .select("*");
